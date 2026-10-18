@@ -43,7 +43,7 @@ def _weekly_metric(
             sample = fridays[-2:]
         else:
             sample = ordered[-2:]
-            note = "Friday observations unavailable; used the latest two trading days."
+            note = "Friday observations unavailable; used the latest two data days."
     else:
         sample = ordered[-5:] if len(ordered) >= 5 else ordered
         if len(sample) < 5:

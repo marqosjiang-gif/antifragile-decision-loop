@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Antifragile Decision Loop — 反脆弱视角周复盘：宏观经济形势辅助决策</title>
-<meta name="description" content="An evidence-first, market-adaptable weekly review loop with an expert council and bounded self-improvement. Research only — no broker connection, no orders.">
+<meta name="description" content="An evidence-first weekly review loop with an eight-role expert council and bounded self-improvement. Research only — takes no external action.">
 <style>
   :root{
     --primary:#00d992; --primary-deep:#10b981; --on-primary:#101010;
@@ -37,7 +37,7 @@
   .eyebrow{font-family:var(--mono);font-size:12px;color:var(--primary);letter-spacing:.18em;text-transform:uppercase;margin-bottom:20px}
   h1{font-size:clamp(38px,6vw,60px);font-weight:400;line-height:1.08;letter-spacing:-1.3px;color:var(--ink-strong);max-width:820px}
   h1 .accent{color:var(--primary)}
-  .hero-sub{margin-top:22px;font-size:18px;max-width:640px;color:var(--body)}
+  .hero-sub{margin-top:22px;font-size:18px;max-width:660px;color:var(--body)}
   .cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
   .btn{display:inline-block;padding:11px 22px;border-radius:6px;font-family:var(--mono);font-size:13px;letter-spacing:.02em;transition:all .18s}
   .btn-primary{background:var(--primary);color:var(--on-primary);font-weight:600}
@@ -47,6 +47,10 @@
   .chips{margin-top:30px;display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px}
   .chip{border:1px solid var(--hairline);border-radius:999px;padding:5px 12px;color:var(--mute)}
   .chip b{color:var(--primary);font-weight:500}
+  .mech{margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:860px}
+  .mech div{border:1px solid var(--hairline);border-radius:8px;padding:16px 18px;background:rgba(26,26,26,.6)}
+  .mech b{display:block;font-family:var(--mono);font-size:20px;font-weight:600;color:var(--primary);margin-bottom:4px}
+  .mech span{font-size:12.5px;color:var(--mute)}
 
   /* sections */
   section{padding:72px 0;border-bottom:1px solid var(--hairline)}
@@ -61,6 +65,8 @@
   .stage .num{font-family:var(--mono);font-size:11px;color:var(--primary);letter-spacing:.14em}
   .stage h3{margin:8px 0 6px;font-size:17px;font-weight:600;color:var(--ink-strong)}
   .stage p{font-size:13.5px;color:var(--mute);line-height:1.55}
+  .stage .contract{margin-top:12px;padding-top:10px;border-top:1px dashed var(--hairline);font-family:var(--mono);font-size:11px;color:var(--mute);line-height:1.6}
+  .stage .contract em{font-style:normal;color:var(--primary)}
   .stage::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--primary);font-family:var(--mono);font-size:15px;z-index:2}
   .stage:nth-child(3n)::after{content:""}
   .spine{margin-top:18px;font-family:var(--mono);font-size:12px;color:var(--mute)}
@@ -68,21 +74,25 @@
 
   /* roles */
   .roles{margin-top:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-  .role{background:var(--canvas-soft);border:1px solid var(--hairline);border-radius:8px;padding:20px 16px;text-align:center;transition:border-color .18s}
+  .role{background:var(--canvas-soft);border:1px solid var(--hairline);border-radius:8px;padding:20px 16px;text-align:center;transition:border-color .18s;display:flex;flex-direction:column}
   .role:hover{border-color:var(--primary)}
   .role img{width:64px;height:64px;border-radius:50%;border:2px solid var(--hairline)}
   .role:hover img{border-color:var(--primary)}
   .role .rn{margin-top:12px;font-size:14px;font-weight:600;color:var(--ink-strong)}
   .role .re{font-family:var(--mono);font-size:10.5px;color:var(--primary);letter-spacing:.1em;margin-top:2px;text-transform:uppercase}
-  .role .rd{margin-top:8px;font-size:12px;color:var(--mute);line-height:1.5}
+  .role .rd{margin-top:8px;font-size:12px;color:var(--mute);line-height:1.5;flex:1}
+  .role .spec{margin-top:10px;padding-top:8px;border-top:1px dashed var(--hairline);font-family:var(--mono);font-size:10px;color:var(--mute);line-height:1.6}
+  .role .spec em{font-style:normal;color:var(--primary)}
 
   /* discipline */
   .layers{margin-top:36px;border:1px solid var(--hairline);border-radius:8px;overflow:hidden}
-  .layer{display:grid;grid-template-columns:200px 1fr;gap:0;border-bottom:1px solid var(--hairline)}
+  .layer{display:grid;grid-template-columns:200px 1fr 240px;gap:0;border-bottom:1px solid var(--hairline)}
   .layer:last-child{border-bottom:none}
   .layer .ln{padding:16px 18px;font-family:var(--mono);font-size:12px;color:var(--ink);border-right:1px solid var(--hairline);background:var(--canvas-soft)}
   .layer .lr{padding:16px 18px;font-size:13.5px;color:var(--mute)}
   .layer .lr b{color:var(--primary);font-weight:500}
+  .layer .lo{padding:16px 18px;font-family:var(--mono);font-size:11px;color:var(--mute);border-left:1px solid var(--hairline);background:rgba(16,16,16,.5)}
+  .layer .lo em{font-style:normal;color:var(--primary)}
 
   .gate{margin-top:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;font-family:var(--mono);font-size:12px;text-align:center}
   .gate div{padding:14px 8px;border-right:1px solid var(--hairline);color:var(--mute)}
@@ -91,13 +101,15 @@
   .gate .w1 b{color:var(--ink)} .gate .w2 b{color:var(--ink)}
   .gate .w25{background:rgba(0,217,146,.07)} .gate .w25 b{color:var(--primary)}
   .gate .w3 b{color:var(--ink)}
+  .gate-note{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--mute)}
+  .gate-note b{color:var(--primary);font-weight:500}
 
   footer{padding:48px 0 64px;color:var(--mute);font-size:13px}
   footer .disc{border:1px solid var(--hairline);border-radius:8px;padding:18px 20px;background:var(--canvas-soft);font-family:var(--mono);font-size:12px;line-height:1.7}
   footer .disc b{color:var(--primary);font-weight:500}
   footer .meta{margin-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:11.5px}
 
-  @media(max-width:900px){.pipe{grid-template-columns:1fr 1fr}.stage::after{content:""}.roles{grid-template-columns:1fr 1fr}.layer{grid-template-columns:1fr}.layer .ln{border-right:none;border-bottom:1px dashed var(--hairline)}.gate{grid-template-columns:1fr 1fr}.gate div{border-bottom:1px solid var(--hairline)}}
+  @media(max-width:900px){.pipe{grid-template-columns:1fr 1fr}.stage::after{content:""}.roles{grid-template-columns:1fr 1fr}.mech{grid-template-columns:1fr}.layer{grid-template-columns:1fr}.layer .ln{border-right:none;border-bottom:1px dashed var(--hairline)}.layer .lo{border-left:none;border-top:1px dashed var(--hairline)}.gate{grid-template-columns:1fr 1fr}.gate div{border-bottom:1px solid var(--hairline)}}
   @media(max-width:560px){.pipe,.roles{grid-template-columns:1fr}}
 </style>
 </head>
@@ -117,16 +129,21 @@
   <div class="wrap">
     <div class="eyebrow">Weekly Review · Macro-Informed Decision Support</div>
     <h1>反脆弱视角周复盘<span class="accent">：</span>宏观经济形势辅助决策</h1>
-    <p class="hero-sub">一个证据优先、多市场可适配的周度复盘闭环：专家团八角色分段协作，已核验的宏观因子只调整风险预算——永不替代技术证据，更不凭空制造交易。</p>
+    <p class="hero-sub">一个证据优先的周度复盘闭环：八角色专家团分段协作、单一问责中枢，已核验的宏观因子只调整风险预算——永不替代证据，更不凭空制造结论。</p>
     <div class="cta">
       <a class="btn btn-primary" href="https://github.com/marqosjiang-gif/antifragile-decision-loop">View on GitHub</a>
       <a class="btn btn-ghost" href="https://github.com/marqosjiang-gif/antifragile-decision-loop/blob/main/README.md">README</a>
     </div>
+    <div class="mech">
+      <div><b>8</b><span>专家团 subagents — 一阶段一责任人</span></div>
+      <div><b>1 spine</b><span>single accountability — 产物必经中枢中转</span></div>
+      <div><b>W2.5</b><span>人工/政策确认门 — 决策相关变更不可自动晋级</span></div>
+    </div>
     <div class="chips">
       <span class="chip">Mode <b>research_only</b></span>
       <span class="chip">Cadence <b>W1 → W2 → W2.5 → W3</b></span>
-      <span class="chip">Gate <b>human / policy</b></span>
-      <span class="chip">Market <b>pluggable adapters</b></span>
+      <span class="chip">Council <b>8 subagents</b></span>
+      <span class="chip">Core <b>stdlib only</b></span>
       <span class="chip">License <b>MIT</b></span>
     </div>
   </div>
@@ -136,14 +153,14 @@
   <div class="wrap">
     <div class="sec-label">01 · Pipeline</div>
     <h2>六阶段周度流水线</h2>
-    <p class="lead">收集、验证、合成、仲裁、决策、发布——每阶段有显式交接契约，产物全程可审计。</p>
+    <p class="lead">收集、验证、合成、仲裁、决策、发布——每阶段有显式的输入→输出契约，产物全程可审计。</p>
     <div class="pipe">
-      <div class="stage"><div class="num">STAGE 01</div><h3>收集</h3><p>行情、公告、新闻、宏观、商品的带日期观察，统一交付校验层。</p></div>
-      <div class="stage"><div class="num">STAGE 02</div><h3>验证</h3><p>信源一致性、时间戳、缺失与冲突检查；未解决分歧阻断结论。</p></div>
-      <div class="stage"><div class="num">STAGE 03</div><h3>合成</h3><p>六视角打分经 MCDA（TOPSIS + VIKOR）硬合成为中立证据矩阵。</p></div>
-      <div class="stage"><div class="num">STAGE 04</div><h3>仲裁</h3><p>硬生存门槛 + 信号优先级；规则引擎主裁，哲学灰区兜底。</p></div>
-      <div class="stage"><div class="num">STAGE 05</div><h3>决策</h3><p>把红绿灯翻译为下周条件化检查点、触发区间与风控。</p></div>
-      <div class="stage"><div class="num">STAGE 06</div><h3>发布</h3><p>渲染可审计的 Markdown / HTML 周报，含证据截止点。</p></div>
+      <div class="stage"><div class="num">STAGE 01</div><h3>收集</h3><p>行情、披露、新闻、宏观、商品的带日期观察，统一交付校验层。</p><div class="contract">in: 任务简报 → <em>out: 带信源标签的原始观察</em></div></div>
+      <div class="stage"><div class="num">STAGE 02</div><h3>验证</h3><p>信源一致性、时间戳、缺失与冲突检查；未解决分歧阻断结论。</p><div class="contract">in: 原始观察 → <em>out: 事实表 + 缺失标记</em></div></div>
+      <div class="stage"><div class="num">STAGE 03</div><h3>合成</h3><p>六视角打分经 MCDA（TOPSIS + VIKOR）硬合成为中立证据矩阵。</p><div class="contract">in: 事实表 → <em>out: 中立证据矩阵 + 冲突清单</em></div></div>
+      <div class="stage"><div class="num">STAGE 04</div><h3>仲裁</h3><p>硬生存门槛 + 信号优先级；规则引擎主裁，哲学灰区兜底。</p><div class="contract">in: 证据矩阵 → <em>out: 🟢🟡🔴 方向建议包</em></div></div>
+      <div class="stage"><div class="num">STAGE 05</div><h3>决策</h3><p>把红绿灯翻译为下一周期条件化检查点、触发区间与风控。</p><div class="contract">in: 建议包 → <em>out: 条件化决策记录</em></div></div>
+      <div class="stage"><div class="num">STAGE 06</div><h3>发布</h3><p>渲染可审计的 Markdown / HTML 周报，含证据截止点。</p><div class="contract">in: 决策记录 → <em>out: 自包含周报</em></div></div>
     </div>
     <p class="spine">单一问责中枢 —— 任何产物必须经过 <b>进化负责人（中枢）</b> 中转，禁止越级直连。</p>
   </div>
@@ -152,17 +169,17 @@
 <section id="council">
   <div class="wrap">
     <div class="sec-label">02 · Expert Council</div>
-    <h2>八角色专家团</h2>
+    <h2>八角色 subagent 规格卡</h2>
     <p class="lead">一个阶段一个责任人。复盘与进化回流后，进入下一轮收集。</p>
     <div class="roles">
-      <div class="role"><img src="avatars/team-lead.png" alt="进化负责人"><div class="rn">沈迭代</div><div class="re">Evolution Lead · 中枢</div><div class="rd">统一调度、阶段门禁、规则固化与自进化</div></div>
-      <div class="role"><img src="avatars/info-collector.png" alt="信息收集员"><div class="rn">甄采集</div><div class="re">① Info Collector</div><div class="rd">行情/公告/新闻/宏观/地缘/商品一键采集</div></div>
-      <div class="role"><img src="avatars/info-verifier.png" alt="信息校验员"><div class="rn">严求真</div><div class="re">② Info Verifier</div><div class="rd">168h+120h 窗口交叉验证，输出事实表</div></div>
-      <div class="role"><img src="avatars/evidence-synthesizer.png" alt="证据合成官"><div class="rn">程多维</div><div class="re">③ Synthesizer</div><div class="rd">六视角 MCDA 硬合成中立证据矩阵</div></div>
-      <div class="role"><img src="avatars/signal-arbitrator.png" alt="信号仲裁官"><div class="rn">仲衡</div><div class="re">④ Arbitrator</div><div class="rd">规则引擎主裁决 + 反脆弱哲学灰区兜底</div></div>
-      <div class="role"><img src="avatars/decision-maker.png" alt="操作决策官"><div class="rn">决断行</div><div class="re">⑤ Decision Maker</div><div class="rd">红绿灯 → 触发区间 / 仓位 / 风控</div></div>
-      <div class="role"><img src="avatars/research-editor.png" alt="投研主编"><div class="rn">圆汇众</div><div class="re">⑥ Research Editor</div><div class="rd">Markdown → 自包含 HTML 周报</div></div>
-      <div class="role"><img src="avatars/review-expert.png" alt="复盘专家"><div class="rn">顾镜</div><div class="re">⑦ Review Expert</div><div class="rd">上周决策 vs 实际走势，结构化复盘</div></div>
+      <div class="role"><img src="avatars/team-lead.png" alt="进化负责人"><div class="rn">沈迭代</div><div class="re">Evolution Lead · 中枢</div><div class="rd">统一调度、阶段门禁、规则固化与自进化</div><div class="spec">owns: <em>调度权 + 晋级权</em><br>rejects: 越级直连</div></div>
+      <div class="role"><img src="avatars/info-collector.png" alt="信息收集员"><div class="rn">甄采集</div><div class="re">① Info Collector</div><div class="rd">行情/披露/新闻/宏观/地缘/商品一键采集</div><div class="spec">in: 简报 → <em>out: 原始观察</em><br>fails: 标注缺失，不编造</div></div>
+      <div class="role"><img src="avatars/info-verifier.png" alt="信息校验员"><div class="rn">严求真</div><div class="re">② Info Verifier</div><div class="rd">168h+120h 窗口交叉验证，输出事实表</div><div class="spec">in: 观察 → <em>out: 事实表</em><br>rule: 双信源或标疑</div></div>
+      <div class="role"><img src="avatars/evidence-synthesizer.png" alt="证据合成官"><div class="rn">程多维</div><div class="re">③ Synthesizer</div><div class="rd">六视角 MCDA 硬合成中立证据矩阵</div><div class="spec">in: 事实表 → <em>out: 证据矩阵</em><br>stance: 中立，不下结论</div></div>
+      <div class="role"><img src="avatars/signal-arbitrator.png" alt="信号仲裁官"><div class="rn">仲衡</div><div class="re">④ Arbitrator</div><div class="rd">规则引擎主裁决 + 反脆弱哲学灰区兜底</div><div class="spec">in: 矩阵 → <em>out: 🟢🟡🔴</em><br>rule: 硬门槛不可旁路</div></div>
+      <div class="role"><img src="avatars/decision-maker.png" alt="操作决策官"><div class="rn">决断行</div><div class="re">⑤ Decision Maker</div><div class="rd">红绿灯 → 触发区间 / 敞口增减 / 风控</div><div class="spec">in: 红绿灯 → <em>out: 条件化决策</em><br>rule: 只条件化，不预测</div></div>
+      <div class="role"><img src="avatars/research-editor.png" alt="投研主编"><div class="rn">圆汇众</div><div class="re">⑥ Research Editor</div><div class="rd">Markdown → 自包含 HTML 周报</div><div class="spec">in: 决策记录 → <em>out: HTML 周报</em><br>rule: 不改结论只排版</div></div>
+      <div class="role"><img src="avatars/review-expert.png" alt="复盘专家"><div class="rn">顾镜</div><div class="re">⑦ Review Expert</div><div class="rd">上周决策 vs 实际走势，结构化复盘</div><div class="spec">in: 报告+实际 → <em>out: 复盘记录</em><br>rule: 截止点前信息 only</div></div>
     </div>
   </div>
 </section>
@@ -171,26 +188,27 @@
   <div class="wrap">
     <div class="sec-label">03 · Discipline</div>
     <h2>信号分层：顺序即纪律</h2>
-    <p class="lead">宏观叙事不能推翻有效的布林带证据；布林带结果也不能推翻数据冲突、小样本回测或生存风险门槛。</p>
+    <p class="lead">宏观叙事不能推翻有效的趋势通道证据；通道结果也不能推翻数据冲突、小样本验证或生存风险门槛。每层只对自己的问题负责。</p>
     <div class="layers">
-      <div class="layer"><div class="ln">数据完整性</div><div class="lr">未解决的价格分歧<b>阻断方向性结论</b>。</div></div>
-      <div class="layer"><div class="ln">历史 BOLL</div><div class="lr">权重最高的技术输入，<b>但不是保证</b>——须先过数据质量与生存风险门槛。</div></div>
-      <div class="layer"><div class="ln">量价与资金确认</div><div class="lr">单日波动抹不掉中期信号；5/10/20 日资金流须与量价一致。</div></div>
-      <div class="layer"><div class="ln">公司证据</div><div class="lr">带日期的披露才能改变论点；<b>后发事件永不回填先前报告</b>。</div></div>
-      <div class="layer"><div class="ln">宏观背景</div><div class="lr">已核验的宏观因子只调整风险预算——<b>约束风险，不制造交易</b>。</div></div>
+      <div class="layer"><div class="ln">数据完整性</div><div class="lr">未解决的信源分歧<b>阻断方向性结论</b>。</div><div class="lo">responsible: <em>验证层</em></div></div>
+      <div class="layer"><div class="ln">历史趋势通道</div><div class="lr">权重最高的背景证据，<b>但不是保证</b>——须先过数据质量与生存风险门槛，且样本充足。</div><div class="lo">responsible: <em>合成层</em></div></div>
+      <div class="layer"><div class="ln">核心指标与资金确认</div><div class="lr">单日波动抹不掉中期信号；5/10/20 日资金流转须与核心指标一致。</div><div class="lo">responsible: <em>合成层</em></div></div>
+      <div class="layer"><div class="ln">披露证据</div><div class="lr">带日期的披露才能改变论点；<b>后发事件永不回填先前报告</b>。</div><div class="lo">responsible: <em>仲裁层</em></div></div>
+      <div class="layer"><div class="ln">宏观背景</div><div class="lr">已核验的宏观因子只调整风险预算——<b>约束风险，不制造结论</b>。</div><div class="lo">responsible: <em>仲裁层</em></div></div>
     </div>
     <div class="gate">
       <div class="w1"><b>W1 · 生成</b>周报脚手架 + 证据截止点</div>
-      <div class="w2"><b>W2 · 复盘</b>预测 vs 实际，识别复现缺口</div>
+      <div class="w2"><b>W2 · 复盘</b>判断 vs 实际，识别复现缺口</div>
       <div class="w25"><b>W2.5 · 人工/政策门</b>规则/阈值/角色/数据源变更必须过门</div>
       <div class="w3"><b>W3 · 进化</b>测试 + 晋级，保留回滚路径</div>
     </div>
+    <p class="gate-note">门语：<b>能改进流程的，先过人这一关</b>——批准、留痕、可回滚，缺一不晋级。</p>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <div class="disc"><b>Disclaimer</b> — 本项目仅用于量化研究与决策支持。不连接券商、不下单、不构成投资建议。无未来收益、胜率或实盘表现的任何声明。个人自选清单、持仓、成本、账户数据与生成报告一律不进入公开提交。</div>
+    <div class="disc"><b>Disclaimer</b> — 本项目仅用于研究与决策支持，不自动执行任何外部操作，不构成投资建议。无未来表现、准确率或实盘结果的任何声明。个人关注清单、账户数据与生成报告一律不进入公开提交。</div>
     <div class="meta">
       <span>ANTIFRAGILE·DECISION·LOOP — <a href="https://github.com/marqosjiang-gif/antifragile-decision-loop">github.com/marqosjiang-gif/antifragile-decision-loop</a></span>
       <span>MIT License · README (EN / <a href="https://github.com/marqosjiang-gif/antifragile-decision-loop/blob/main/docs/README.zh-CN.md">中文</a> / <a href="https://github.com/marqosjiang-gif/antifragile-decision-loop/blob/main/docs/README.es.md">ES</a>)</span>

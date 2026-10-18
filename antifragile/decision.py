@@ -1,4 +1,4 @@
-"""Auditable decision arbitration with BOLL as the highest weighted signal."""
+"""Auditable decision arbitration with the trend channel as the highest weighted signal."""
 
 from __future__ import annotations
 
@@ -6,13 +6,13 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 
-BollAction = Literal["buy", "hold", "sell", "none"]
+ChannelStance = Literal["upside", "hold", "downside", "none"]
 
 
 @dataclass(frozen=True)
-class BollEvidence:
-    action: BollAction = "none"
-    completed_trades: int = 0
+class TrendChannelEvidence:
+    action: ChannelStance = "none"
+    completed_samples: int = 0
     win_rate: float | None = None
     efficiency_per_day: float | None = None
     verified: bool = False
@@ -21,14 +21,14 @@ class BollEvidence:
 
     @property
     def sample_is_actionable(self) -> bool:
-        return self.verified and self.completed_trades >= 3
+        return self.verified and self.completed_samples >= 3
 
 
 @dataclass(frozen=True)
 class ResearchEvidence:
     price_verified: bool
-    volume_verified: bool
-    boll: BollEvidence = field(default_factory=BollEvidence)
+    activity_verified: bool
+    channel: TrendChannelEvidence = field(default_factory=TrendChannelEvidence)
     flow_5d: float | None = None
     flow_20d: float | None = None
     flow_verified: bool = False
@@ -39,17 +39,17 @@ class ResearchEvidence:
 
 @dataclass(frozen=True)
 class Decision:
-    label: Literal["buy", "hold", "reduce", "observe"]
+    label: Literal["upside", "hold", "downside", "observe"]
     action: str
     confidence: Literal["high", "medium", "low"]
     reasons: tuple[str, ...]
 
 
 def decide(evidence: ResearchEvidence) -> Decision:
-    """Apply hard validation, then BOLL > price/volume > flow > fundamentals/events.
+    """Apply hard validation, then trend channel > confirmation indicators > capital flows > fundamentals/events.
 
     Lower-priority evidence can reduce confidence or tighten risk, but cannot
-    silently override an actionable historical BOLL signal.
+    silently override an actionable historical trend-channel signal.
     """
     if evidence.survival_risk:
         return Decision(
@@ -58,23 +58,23 @@ def decide(evidence: ResearchEvidence) -> Decision:
             "low",
             ("survival-risk hard gate failed",),
         )
-    if not evidence.price_verified or not evidence.volume_verified:
+    if not evidence.price_verified or not evidence.activity_verified:
         return Decision(
             "observe",
-            "Do not issue a directional action until price and volume are verified.",
+            "Do not issue a directional judgement until price and activity data are verified.",
             "low",
-            ("price/volume hard gate failed",),
+            ("price/activity hard gate failed",),
         )
 
-    boll = evidence.boll
-    reasons: list[str] = ["price and volume verified"]
-    if boll.verified:
+    channel = evidence.channel
+    reasons: list[str] = ["price and activity data verified"]
+    if channel.verified:
         reasons.append(
-            f"BOLL={boll.action}, timeframe={boll.timeframe}, "
-            f"completed_trades={boll.completed_trades}"
+            f"channel={channel.action}, timeframe={channel.timeframe}, "
+            f"completed_samples={channel.completed_samples}"
         )
     else:
-        reasons.append("BOLL unavailable")
+        reasons.append("trend channel unavailable")
 
     flow_negative = (
         evidence.flow_verified
@@ -84,35 +84,35 @@ def decide(evidence: ResearchEvidence) -> Decision:
         and evidence.flow_20d < 0
     )
     if evidence.flow_verified:
-        reasons.append("5/20-day capital flow verified")
+        reasons.append("5/20-day capital flows verified")
     else:
-        reasons.append("capital flow unverified")
+        reasons.append("capital flows unverified")
 
-    if boll.sample_is_actionable and boll.action == "sell":
+    if channel.sample_is_actionable and channel.action == "downside":
         return Decision(
-            "reduce",
-            "The best historical BOLL sell region is active; reduce exposure by plan.",
+            "downside",
+            "The best historical trend-channel downside region is active; tighten exposure by plan.",
             "high" if flow_negative or evidence.adverse_event_verified else "medium",
             tuple(reasons),
         )
-    if boll.sample_is_actionable and boll.action == "buy":
+    if channel.sample_is_actionable and channel.action == "upside":
         if flow_negative or evidence.adverse_event_verified:
             return Decision(
                 "observe",
-                "BOLL buy region is active, but conflicting verified risk limits action to observation or a pre-sized probe.",
+                "Trend-channel upside region is active, but conflicting verified risk limits action to observation or a pre-sized probe.",
                 "medium",
                 tuple(reasons),
             )
         return Decision(
-            "buy",
-            "The best historical BOLL buy region is active; execute only the pre-sized staged plan.",
+            "upside",
+            "The best historical trend-channel upside region is active; proceed only with the pre-sized staged plan.",
             "high" if evidence.flow_verified else "medium",
             tuple(reasons),
         )
-    if boll.sample_is_actionable and boll.action == "hold":
+    if channel.sample_is_actionable and channel.action == "hold":
         return Decision(
             "hold",
-            "Keep existing exposure and wait for the historical BOLL exit trigger.",
+            "Keep existing exposure and wait for the historical trend-channel exit trigger.",
             "medium",
             tuple(reasons),
         )
@@ -120,24 +120,24 @@ def decide(evidence: ResearchEvidence) -> Decision:
     if flow_negative or evidence.adverse_event_verified:
         return Decision(
             "observe",
-            "Tighten risk and wait for BOLL plus price/volume confirmation.",
+            "Tighten risk and wait for trend-channel plus confirmation-indicator agreement.",
             "low",
             tuple(reasons),
         )
     return Decision(
         "observe",
-        "No actionable BOLL signal; keep the conclusion conditional.",
+        "No actionable trend-channel signal; keep the conclusion conditional.",
         "low",
         tuple(reasons),
     )
 
 
-def boll_position_wording(position_pct: float) -> str:
-    """Keep action wording consistent with the actual BOLL band position."""
+def channel_position_wording(position_pct: float) -> str:
+    """Keep judgement wording consistent with the actual channel band position."""
     if position_pct > 100:
-        return "above_upper_band_sell_region"
+        return "above_upper_band_downside_region"
     if position_pct < 0:
-        return "below_lower_band_buy_region"
+        return "below_lower_band_upside_region"
     if position_pct <= 8:
         return "near_lower_band"
     if position_pct >= 92:

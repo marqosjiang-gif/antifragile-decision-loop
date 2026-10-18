@@ -1,0 +1,10 @@
+{
+  "description": "Public schema only. Copy to focus_list.local.json and replace with your own focus list. Do not add account, email, token, or API key.",
+  "subjects": [
+    {
+      "code": "EXAMPLE-001",
+      "exchange": "DEMO",
+      "name": "Example subject"
+    }
+  ]
+}

@@ -28,14 +28,14 @@ flowchart LR
 1. Use only information that was available by the original report's `evidence_cutoff` when judging the report.
 2. Classify the difference as `judgment_error`, `information_omission`, `post_report_event`, or `data_or_execution_error`.
 3. Promote only a recurring, decision-relevant rule that improves auditability or execution safety.
-4. Keep one-off market opinions, private portfolio details and generated reports local.
+4. Keep one-off market opinions, private focus details and generated reports local.
 5. Route changes to signal priority, thresholds, agent roles, prompts, data sources or fallback chains through the W2.5 human/policy gate.
 6. Allow automatic promotion only for wording, formatting and non-decision-affecting presentation fixes, with a record.
 7. If a post-promotion check fails, restore the previous rule and mark the change `rolled_back`.
 
 ## What “autonomous” means here
 
-The loop can detect repeated failure modes, propose a rule change, update a local experiment, and run tests. It cannot place orders, change a brokerage account, or silently publish private data. Autonomy is bounded by evidence, reproducibility, reversible promotion and a human/policy checkpoint for decision-affecting changes.
+The loop can detect repeated failure modes, propose a rule change, update a local experiment, and run tests. It cannot take any external action on the user's behalf, touch an external account, or silently publish private data. Autonomy is bounded by evidence, reproducibility, reversible promotion and a human/policy checkpoint for decision-affecting changes.
 
 ## Minimal review record
 

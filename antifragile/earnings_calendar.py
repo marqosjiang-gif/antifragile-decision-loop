@@ -5,11 +5,11 @@
 
 目的
 ----
-将本地研究标的的「财报预约披露日期」提前体现在反脆弱周盘策略报告中。
-若某标的在报告日之后 N 天内（默认 7 天 = 下周窗口）披露财报，周报必须
-明确列出，使读者在财报落地前就做好仓位与风控准备。
+将本地关注对象的「财报预约披露日期」提前体现在反脆弱周盘策略报告中。
+若某关注对象在报告日之后 N 天内（默认 7 天 = 下周窗口）披露财报，周报必须
+明确列出，使读者在财报落地前就做好风险敞口与风控准备。
 
-    > 例：7 月 22 日发布财报的标的，必须在 7 月 19 日的周报中写明。
+    > 例：7 月 22 日发布财报的关注对象，必须在 7 月 19 日的周报中写明。
 
 数据来源优先级（遵从 AGENTS.md：不得静默编造 / 不得静默降级为模拟数据）
 ------------------------------------------------------------------------
@@ -23,14 +23,14 @@ earnings_calendar.json 字段说明
   source         : 数据来源标注（local_manual / cninfo / eastmoney / mixed）
   horizon_days   : 重点前瞻窗口（天），默认 7（覆盖"下周"）
   extended_days  : 完整前瞻窗口（天），默认 30
-  stocks[]:
-    code           : 交易所代码，如 600000.SH
+  subjects[]:
+    code           : 市场代码，如 EXAMPLE-001.DEMO
     name           : 证券简称
     report_period  : 报告期，如 2026Q2 / 2026H1（可留空，按日期推断）
     report_type    : 报告类型，如 半年度报告 / 第三季度报告（可留空，按日期推断）
     scheduled_date : 预约披露日期 YYYY-MM-DD（null = 待更新）
     source         : 该条来源（cninfo / eastmoney / manual）
-    note           : 备注（如「已预告」「待交易所排期」）
+    note           : 备注（如「已预告」「待市场排期」）
 
 仅依赖标准库，便于 run_weekly_report.py 直接 import，无需额外依赖。
 """
@@ -85,14 +85,14 @@ def load_calendar(path: Optional[str] = None) -> Dict:
             "source": "none",
             "horizon_days": DEFAULT_HORIZON_DAYS,
             "extended_days": DEFAULT_EXTENDED_DAYS,
-            "stocks": [],
+            "subjects": [],
         }
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         data.setdefault("horizon_days", DEFAULT_HORIZON_DAYS)
         data.setdefault("extended_days", DEFAULT_EXTENDED_DAYS)
-        data.setdefault("stocks", [])
+        data.setdefault("subjects", [])
         return data
     except (json.JSONDecodeError, OSError) as e:
         print(f"  ⚠️ 财报日历读取失败: {e}，降级为空日历")
@@ -101,7 +101,7 @@ def load_calendar(path: Optional[str] = None) -> Dict:
             "source": "error",
             "horizon_days": DEFAULT_HORIZON_DAYS,
             "extended_days": DEFAULT_EXTENDED_DAYS,
-            "stocks": [],
+            "subjects": [],
         }
 
 
@@ -188,7 +188,7 @@ def fetch_live_scheduled_date(code: str) -> Optional[str]:
     绝不在此编造日期。
 
     Args:
-        code: 带交易所后缀代码，如 600000.SH / 000001.SZ
+        code: 带市场后缀代码，如 EXAMPLE-001.DEMO / EXAMPLE-002.DEMO
     Returns:
         预约披露日期字符串，或 None
     """
@@ -231,12 +231,12 @@ def refresh_calendar(calendar: Dict, codes: Optional[List[str]] = None) -> Dict:
     对日历中 scheduled_date 为空的条目尝试实时补全；成功才写入，失败保持原样。
     返回（可能已更新的）calendar。
     """
-    stocks = calendar.get("stocks", [])
+    subjects = calendar.get("subjects", [])
     if codes:
         target = {c for c in codes}
-        stocks = [s for s in stocks if s.get("code") in target]
+        subjects = [s for s in subjects if s.get("code") in target]
     refreshed = 0
-    for s in stocks:
+    for s in subjects:
         if s.get("scheduled_date"):
             continue
         live = fetch_live_scheduled_date(s.get("code", ""))
@@ -277,7 +277,7 @@ def get_upcoming(
 
     focus, extended, overdue, pending = [], [], [], []
 
-    for s in calendar.get("stocks", []):
+    for s in calendar.get("subjects", []):
         code = s.get("code", "")
         name = s.get("name", code)
         sd = s.get("scheduled_date")
@@ -327,7 +327,7 @@ def get_upcoming(
 # --------------------------------------------------------------------------- #
 # Markdown 渲染
 # --------------------------------------------------------------------------- #
-_PLACEHOLDER_NOTES = ("待填写", "待更新", "待交易所排期", "示例", "待核实")
+_PLACEHOLDER_NOTES = ("待填写", "待更新", "待市场排期", "示例", "待核实")
 
 
 def _is_placeholder_note(note: str) -> bool:
@@ -344,8 +344,8 @@ def _row_focus(it: Dict) -> str:
         countdown = "**明日（1天）**"
     else:
         countdown = f"{days}天（{it.get('weekday','')}）"
-    hint = ("披露前 1–2 个交易日降低该标的短线博弈仓位，防范业绩不及预期踩踏；"
-            "披露后结合 EarningsMonitor 实际数据重估（详见持仓事件监控 / 塔勒布审计）。")
+    hint = ("披露前 1–2 个交易日降低该关注对象的事件前风险敞口，防范业绩不及预期踩踏；"
+            "披露后结合 EarningsMonitor 实际数据重估（详见事件监控 / 塔勒布审计）。")
     note = f"｜{it['note']}" if not _is_placeholder_note(it.get("note", "")) else ""
     return (f"| {it['name']}({it['code']}) | {it.get('report_period','')} | "
             f"{it.get('report_type','')} | {it['scheduled_date']} | {countdown} "
@@ -394,7 +394,7 @@ def generate_section(
     if src in ("none", "error", ""):
         src_note = ("⚠️ **财报日历数据缺失**：本地 earnings_calendar.json 无有效日程，"
                     "且实时预约披露接口不可用；本报告未编造任何披露日期。"
-                    "请在 earnings_calendar.json 填写本地研究标的的预约披露日。")
+                    "请在 earnings_calendar.json 填写本地关注对象的预约披露日。")
         live_status = "本地日历缺失 / 实时接口不可用"
     else:
         live_status = "本地日历（source=" + str(src) + ("）" if src else ")")
@@ -406,7 +406,7 @@ def generate_section(
         f"## 财报披露前瞻（未来 {horizon_days} 天重点 + 未来 {extended_days} 天清单）",
         "",
         f"> 报告日 {base.strftime('%Y-%m-%d')}（{_weekday_cn(base)}）。"
-        f"本模块将持仓股财报预约披露日**提前**列出，使财报落地前的仓位与风控准备可见。",
+        f"本模块将关注对象财报预约披露日**提前**列出，使财报落地前的风险敞口与风控准备可见。",
         f"> {src_note}",
         "",
         f"### 1.1 未来 {horizon_days} 天重点披露（下周财报预告）",
@@ -414,15 +414,15 @@ def generate_section(
     ]
 
     if focus:
-        lines.append("| 标的 | 报告期 | 报告类型 | 预约披露日 | 距报告日 | 披露前风控提示 |")
+        lines.append("| 关注对象 | 报告期 | 报告类型 | 预约披露日 | 距报告日 | 披露前风控提示 |")
         lines.append("|------|--------|----------|------------|----------|----------------|")
         for it in focus:
             lines.append(_row_focus(it))
         lines.append("")
-        lines.append("**📌 重点**：上表标的在未来一周内披露财报，其价格/波动率可能在披露前后放大，"
+        lines.append("**📌 重点**：上表关注对象在未来一周内披露财报，其价格/波动率可能在披露前后放大，"
                      "下周操作决策建议已将其纳入风险控制考量。")
     else:
-        lines.append(f"✅ 未来 {horizon_days} 天内无持仓股预约披露（财报空窗周）。")
+        lines.append(f"✅ 未来 {horizon_days} 天内无关注对象预约披露（财报空窗周）。")
     lines.append("")
 
     # 1.2 完整 30 天清单（不含已在重点中的）
@@ -430,7 +430,7 @@ def generate_section(
     lines.append("")
     combined_ext = focus + extended
     if combined_ext:
-        lines.append("| 标的 | 报告期 | 预约披露日 | 倒计时 |")
+        lines.append("| 关注对象 | 报告期 | 预约披露日 | 倒计时 |")
         lines.append("|------|--------|------------|--------|")
         for it in combined_ext:
             lines.append(_row_simple(it, with_countdown=True))
@@ -444,7 +444,7 @@ def generate_section(
     if overdue:
         lines.append("**已越过预约日（本期可能已披露，需结合 EarningsMonitor 核验实际数据）：**")
         lines.append("")
-        lines.append("| 标的 | 报告期 | 预约披露日 | 状态 |")
+        lines.append("| 关注对象 | 报告期 | 预约披露日 | 状态 |")
         lines.append("|------|--------|------------|------|")
         for it in overdue:
             lines.append(f"| {it['name']}({it['code']}) | {it.get('report_period','')} | "
@@ -458,10 +458,10 @@ def generate_section(
             lines.append(f"- {it['name']}({it['code']}){extra}")
         lines.append("")
         lines.append("> 维护方式：编辑项目根目录 `earnings_calendar.json`，"
-                     "为每只标的填写 `scheduled_date`（YYYY-MM-DD）；"
+                     "为每个关注对象填写 `scheduled_date`（YYYY-MM-DD）；"
                      "亦可运行 `python earnings_calendar.py --refresh` 尝试实时补全。")
     if not overdue and not pending:
-        lines.append("✅ 全部持仓股预约披露日均已填写且在窗口内或已核验。")
+        lines.append("✅ 全部关注对象预约披露日均已填写且在窗口内或已核验。")
     lines.append("")
 
     return "\n".join(lines)

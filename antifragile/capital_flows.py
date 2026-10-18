@@ -1,4 +1,4 @@
-"""Capital-flow window calculations with explicit trading-date coverage."""
+"""Capital-flow window calculations with explicit data-day coverage."""
 
 from __future__ import annotations
 
@@ -9,24 +9,24 @@ from typing import Iterable, Mapping
 
 @dataclass(frozen=True)
 class FlowWindow:
-    trading_days: int
+    data_days: int
     start: date
     end: date
     net_amount: float
 
 
-def classify_stock_flow(
+def classify_capital_flow(
     net_amount: float,
-    market_cap_cny: float,
+    total_capitalization: float,
 ) -> str:
-    """Classify 20-day flow using liquidity-aware public thresholds.
+    """Classify 20-day capital flows using liquidity-aware public thresholds.
 
-    Large-cap and smaller-cap stocks must not share one absolute threshold.
-    The output is research context, not a standalone trade instruction.
+    Larger and smaller capitalized subjects must not share one absolute threshold.
+    The output is research context, not a standalone action instruction.
     """
-    if market_cap_cny <= 0:
-        raise ValueError("market_cap_cny must be positive")
-    if market_cap_cny >= 100_000_000_000:
+    if total_capitalization <= 0:
+        raise ValueError("total_capitalization must be positive")
+    if total_capitalization >= 100_000_000_000:
         inflow, outflow, neutral = 3_000_000_000, -3_000_000_000, 1_000_000_000
     else:
         inflow, outflow, neutral = 150_000_000, -150_000_000, 50_000_000
@@ -42,17 +42,17 @@ def classify_stock_flow(
 def aggregate_flows(
     rows: Iterable[Mapping[str, object]], windows: tuple[int, ...] = (5, 10, 20)
 ) -> dict[int, FlowWindow]:
-    """Aggregate verified daily flows and retain the exact date range.
+    """Aggregate verified daily capital flows and retain the exact date range.
 
     Each row requires ``date`` (ISO date or ``date``) and ``net_amount``.
-    Duplicate trading dates are rejected to prevent accidental double counting.
+    Duplicate data days are rejected to prevent accidental double counting.
     """
     parsed: dict[date, float] = {}
     for row in rows:
         raw_date = row.get("date")
         day = raw_date if isinstance(raw_date, date) else date.fromisoformat(str(raw_date))
         if day in parsed:
-            raise ValueError(f"duplicate trading date: {day.isoformat()}")
+            raise ValueError(f"duplicate data day: {day.isoformat()}")
         parsed[day] = float(row["net_amount"])
 
     ordered = sorted(parsed.items())
@@ -64,7 +64,7 @@ def aggregate_flows(
             continue
         sample = ordered[-size:]
         result[size] = FlowWindow(
-            trading_days=size,
+            data_days=size,
             start=sample[0][0],
             end=sample[-1][0],
             net_amount=sum(amount for _, amount in sample),

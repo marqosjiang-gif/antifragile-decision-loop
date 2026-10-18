@@ -4,16 +4,16 @@ project:
   name: antifragile-research-loop
   market_profile: generic
 
-market_adapter:
-  # Set this only in a local ignored config for a real exchange or venue.
+context_adapter:
+  # Set this only in a local ignored config for a real data source or venue.
   calendar: ""
-  settlement: ""
-  price_limits: ""
-  short_selling: ""
-  corporate_actions: ""
+  sessions: ""
+  data_limits: ""
+  coverage_notes: ""
+  source_updates: ""
 
 optional:
   market_data_provider: ""
-  boll_backtest_script: ""
+  trend_channel_validation: ""
   local_python: ""
   event_verification_key: ""

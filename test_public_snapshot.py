@@ -3,12 +3,12 @@ from datetime import datetime, timedelta, timezone
 
 from antifragile.cftc import parse_disaggregated_gold
 from antifragile.decision import (
-    BollEvidence,
+    TrendChannelEvidence,
     ResearchEvidence,
-    boll_position_wording,
+    channel_position_wording,
     decide,
 )
-from antifragile.flows import aggregate_flows, classify_stock_flow
+from antifragile.capital_flows import aggregate_flows, classify_capital_flow
 from antifragile.freshness import evaluate_scan_coverage, is_fresh_event
 from antifragile.market_context import _weekly_metric, parse_fred_series
 class PublicSnapshotTests(unittest.TestCase):
@@ -34,11 +34,11 @@ class PublicSnapshotTests(unittest.TestCase):
 
     def test_flow_classification_uses_liquidity_tiers(self):
         self.assertEqual(
-            classify_stock_flow(200_000_000, 20_000_000_000),
+            classify_capital_flow(200_000_000, 20_000_000_000),
             "persistent_inflow",
         )
         self.assertEqual(
-            classify_stock_flow(200_000_000, 200_000_000_000),
+            classify_capital_flow(200_000_000, 200_000_000_000),
             "range_bound",
         )
 
@@ -50,53 +50,53 @@ class PublicSnapshotTests(unittest.TestCase):
 
     def test_no_event_requires_complete_scan(self):
         coverage = evaluate_scan_coverage(
-            ("trade", "strait", "europe"),
-            ("trade", "strait"),
+            ("shipping", "strait", "europe"),
+            ("shipping", "strait"),
         )
         self.assertFalse(coverage.is_complete)
         self.assertEqual(coverage.missing, ("europe",))
 
-    def test_price_volume_gate_blocks_directional_action(self):
+    def test_price_activity_gate_blocks_directional_judgement(self):
         result = decide(
             ResearchEvidence(
                 price_verified=True,
-                volume_verified=False,
-                boll=BollEvidence("buy", 8, 0.75, 0.4, True),
+                activity_verified=False,
+                channel=TrendChannelEvidence("upside", 8, 0.75, 0.4, True),
             )
         )
         self.assertEqual(result.label, "observe")
         self.assertEqual(result.confidence, "low")
 
-    def test_actionable_boll_has_priority(self):
+    def test_actionable_channel_has_priority(self):
         result = decide(
             ResearchEvidence(
                 price_verified=True,
-                volume_verified=True,
-                boll=BollEvidence("sell", 6, 0.67, 0.2, True),
+                activity_verified=True,
+                channel=TrendChannelEvidence("downside", 6, 0.67, 0.2, True),
                 flow_5d=2,
                 flow_20d=9,
                 flow_verified=True,
             )
         )
-        self.assertEqual(result.label, "reduce")
+        self.assertEqual(result.label, "downside")
 
-    def test_low_sample_boll_is_not_a_hard_trade(self):
+    def test_low_sample_channel_is_not_a_hard_judgement(self):
         result = decide(
             ResearchEvidence(
                 price_verified=True,
-                volume_verified=True,
-                boll=BollEvidence("buy", 2, 1.0, 0.9, True),
+                activity_verified=True,
+                channel=TrendChannelEvidence("upside", 2, 1.0, 0.9, True),
                 flow_verified=False,
             )
         )
         self.assertEqual(result.label, "observe")
 
-    def test_conflicting_verified_risk_constrains_boll_buy(self):
+    def test_conflicting_verified_risk_constrains_channel_upside(self):
         result = decide(
             ResearchEvidence(
                 price_verified=True,
-                volume_verified=True,
-                boll=BollEvidence("buy", 5, 0.8, 0.3, True),
+                activity_verified=True,
+                channel=TrendChannelEvidence("upside", 5, 0.8, 0.3, True),
                 flow_5d=-1,
                 flow_20d=-4,
                 flow_verified=True,
@@ -108,21 +108,21 @@ class PublicSnapshotTests(unittest.TestCase):
         result = decide(
             ResearchEvidence(
                 price_verified=True,
-                volume_verified=True,
-                boll=BollEvidence("buy", 9, 0.8, 0.4, True),
+                activity_verified=True,
+                channel=TrendChannelEvidence("upside", 9, 0.8, 0.4, True),
                 survival_risk=True,
             )
         )
         self.assertEqual(result.label, "observe")
 
-    def test_boll_wording_matches_band_position(self):
+    def test_channel_wording_matches_band_position(self):
         self.assertEqual(
-            boll_position_wording(101), "above_upper_band_sell_region"
+            channel_position_wording(101), "above_upper_band_downside_region"
         )
         self.assertEqual(
-            boll_position_wording(-1), "below_lower_band_buy_region"
+            channel_position_wording(-1), "below_lower_band_upside_region"
         )
-        self.assertEqual(boll_position_wording(5), "near_lower_band")
+        self.assertEqual(channel_position_wording(5), "near_lower_band")
 
     def test_fred_weekly_window_uses_latest_five_valid_values(self):
         points = parse_fred_series(
