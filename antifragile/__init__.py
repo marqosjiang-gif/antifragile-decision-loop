@@ -1,4 +1,4 @@
-"""Privacy-safe research primitives for the weekly A-share loop."""
+"""Privacy-safe research primitives for the weekly market review loop."""
 
 from .decision import BollEvidence, Decision, ResearchEvidence, decide
 from .flows import FlowWindow, aggregate_flows

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Maintain the public A-share medium-low frequency quant research core without introducing personal portfolio data or unsupported market claims.
+Maintain the public multi-market weekly review research core without introducing personal portfolio data or unsupported market claims.
 
 ## Non-negotiable rules
 
@@ -36,4 +36,4 @@ python3 -m unittest test_public_snapshot -v
 git diff --check
 ```
 
-Public behavior and the full research protocol are documented in `A股反脆弱策略SKILL.md` and `docs/RESEARCH_PROTOCOL.md`.
+Public behavior and the full research protocol are documented in `WEEKLY-REVIEW-PROTOCOL.md` and `docs/RESEARCH_PROTOCOL.md`.

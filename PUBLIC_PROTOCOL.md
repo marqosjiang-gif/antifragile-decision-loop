@@ -3,7 +3,7 @@
 ## Scope
 
 This repository supports medium-low frequency research through market adapters.
-The included examples are venue-neutral; an A-share adapter may be added locally,
+The included examples are venue-neutral; a market adapter may be added locally,
 but its rules must not be treated as universal. The public core does not execute
 orders or manage brokerage accounts.
 
