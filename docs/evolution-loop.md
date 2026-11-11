@@ -23,6 +23,20 @@ flowchart LR
 - **Render-level checks:** output structure and forbidden wording are checked after generation, so formatting drift cannot silently change meaning.
 - **Reversible promotion:** every promoted rule keeps its previous version, approval record, test result and rollback path.
 
+## Latest iteration (Q4 2026)
+
+The recent work targeted **silent failures**: every check is green, yet the published result is still wrong.
+
+- **Two-gate data contracts:** freshness alone cannot detect a forgotten rebuild. An artifact/source `as_of` consistency sub-gate now blocks the render, and a planted-drift regression proves it fires.
+- **Distribution-anchored thresholds:** a legacy cut-off was falsified by its own empirical percentile. Five quantile bands are derived from the observed series; thresholds live in a versioned source, not in prose.
+- **Conservative defer gate:** an ambiguous business sentence became four explicit states. Machine-inferred support is rejected, unverifiable inputs degrade to `INSUFFICIENT`, and `ALLOW` never authorises an immediate increase.
+- **Post-render claim audit:** a read-only 0/1/2 auditor checks named subjects, quantified anchors with as-of, source labels, and parallel presentation of competing attributions.
+- **Rename-aware dependency hygiene:** a renamed verification path silently disabled a third-source check. Callers are now audited globally on rename, and "no result" is a neutral state rather than a fabricated failure.
+- **Landing verification:** a rule is not implemented until its consumer path is checked end to end. Entry gates were added where a rule existed but had no execution checkpoint.
+- **Publication privacy guard:** an automated scan fails the suite if private data reaches public text.
+
+See [CASE-STUDIES.md](CASE-STUDIES.md) for the delivery-oriented narrative of these changes.
+
 ## Promotion rules
 
 1. Use only information that was available by the original report's `evidence_cutoff` when judging the report.

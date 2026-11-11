@@ -20,13 +20,16 @@ Maintain the public multi-source weekly review research core without introducing
 - Treat macro indices, commodities, and other context series as constraints, never standalone directional conclusions.
 - Keep disclosure dates forward-looking and explicit; missing dates must remain missing.
 - Do not take external actions or send email from the public core.
+- A source pull and a rendered artifact must carry matching `as_of` values; freshness alone is not a publish gate.
+- Run claim and wording checks after rendering; every directional claim needs a named subject, a quantified anchor with an as-of, and a reachable source.
+- Consume human-registered facts only; unverified or machine-inferred support degrades to a conservative state.
 
 ## Privacy and publication
 
-- Never commit account data, exposure size, cost figures, personal history, report output, email addresses, API keys, tokens, local paths, caches, or WorkBuddy/automation state.
+- Never commit account data, exposure size, cost figures, personal history, report output, email addresses, API keys, tokens, local paths, caches, or host automation state.
 - Keep credentials in environment variables or ignored local files only.
 - Before publishing, run a sensitive-data scan, review the staged file list, and stage explicit paths rather than `git add -A`.
-- Never publish WorkBuddy scripts that contain embedded subject maps, recipient addresses, access tokens, provider caches, or local interpreter paths.
+- Never publish host-automation scripts that contain embedded subject maps, recipient addresses, access tokens, provider caches, or local interpreter paths.
 
 ## Verification
 

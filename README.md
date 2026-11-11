@@ -16,7 +16,7 @@ An evidence-first weekly review loop with an eight-role expert council and bound
 [![Cadence: Weekly review](https://img.shields.io/badge/Cadence-Weekly_review-1a1a1a.svg)](#bounded-self-improvement)
 [![Mode: Research only](https://img.shields.io/badge/Mode-Research_only-1a1a1a.svg)](#privacy-boundary)
 
-**[Why](#why-this-project) · [Expert council](#the-expert-council) · [Signal hierarchy](#signal-hierarchy) · [Evolution](#bounded-self-improvement) · [Quick start](#quick-start) · [Live preview](docs/preview.html) · [Privacy](#privacy-boundary)**
+**[Why](#why-this-project) · [Expert council](#the-expert-council) · [What's new](#whats-new-q4-2026) · [Signal hierarchy](#signal-hierarchy) · [Evolution](#bounded-self-improvement) · [Quick start](#quick-start) · [Case studies](docs/CASE-STUDIES.md) · [Live preview](docs/preview.html) · [Privacy](#privacy-boundary)**
 
 </div>
 
@@ -44,6 +44,25 @@ Its reusable methods are:
 The repository contains a public reference runner, a configurable focus-list template, the public research protocol, the expert-council design, the evolution-loop contract, and tests. Your own focus list, account data, API credentials, reports, and local caches stay outside Git.
 
 The public entry point is intentionally small: `weekly_review.py` creates a research scaffold, while `run_weekly_report.py` is only a compatibility wrapper. Source-specific data clients belong in a local adapter and are never required by the public core.
+
+## What's New (Q4 2026)
+
+The latest iteration focused on **silent failures** — cases where every check is
+green and the published result is still wrong. All additions are domain-neutral,
+standard-library-only, and covered by regression tests.
+
+| Addition | Failure it prevents | Implementation |
+|---|---|---|
+| Dual data-contract gates | A source was refreshed but the artifact was never rebuilt, so a freshness-only check passed with exit 0 | [`antifragile/source_contract.py`](antifragile/source_contract.py) |
+| Distribution-derived tiers | A conventional "strong/weak" cut-off sat at the wrong percentile of its own history | [`antifragile/quantile_tiers.py`](antifragile/quantile_tiers.py) |
+| Conservative defer state machine | A model guessing a business fact it is not allowed to infer | [`antifragile/defer_gate.py`](antifragile/defer_gate.py) |
+| Post-render claim audit | Cautious copy becoming absolute, unattributed or falsely adjudicated after formatting | [`antifragile/claim_audit.py`](antifragile/claim_audit.py) |
+| Publication privacy guard | Private data reaching a public commit without anyone noticing | [`test_public_privacy.py`](test_public_privacy.py) |
+| Position-fit case studies | Method claims with nothing checkable behind them | [English](docs/CASE-STUDIES.md) · [简体中文](docs/POSITION-FIT.zh-CN.md) |
+
+See [`docs/CASE-STUDIES.md`](docs/CASE-STUDIES.md) for how these mechanisms map to
+an industry-solution consulting role: business-question framing, technical
+translation, data modelling and discovery of unstated requirements.
 
 ## The Expert Council
 
@@ -153,6 +172,23 @@ flowchart LR
 
 The ordering matters. A macro story cannot override valid trend-channel evidence, and a channel result cannot override a data conflict, a low-sample validation, or a survival-risk gate.
 
+## From Insight to Deliverable
+
+A recurring consulting problem: a recommendation sounds reasonable but cannot be
+handed to engineering. This repository keeps a repeatable translation pattern:
+
+| Business sentence | Mechanism | Checkable artifact |
+|---|---|---|
+| "The chart must reflect the latest data" | Two independent contract checks, one of them an artifact/source consistency sub-gate | `source_contract.evaluate_source_contract` + a planted drift test |
+| "This label should mean 'strong'" | Empirical-percentile calibration instead of inherited constants | `quantile_tiers.legacy_percentile` + a five-tier scale derived from samples |
+| "If support is expected, the pause may be lifted" | A four-state gate with human-registered, dated facts | `defer_gate.evaluate_defer` + conservative-degradation tests |
+| "The copy must stay cautious" | A read-only post-render audit with 0/1/2 exit codes | `claim_audit.audit_claims` + rewrite hints |
+
+The shared design decision is a **capability boundary**: the loop consumes
+registered facts; it does not infer them, does not adjudicate between competing
+explanations, and does not take any external action. That boundary is encoded in
+code rather than asserted in documentation.
+
 ## Configuration
 
 | File | Purpose | Public? |
@@ -163,6 +199,11 @@ The ordering matters. A macro story cannot override valid trend-channel evidence
 | `config.local.yaml` | Your paths, keys, and local settings | No, ignored |
 | [`PUBLIC_PROTOCOL.md`](PUBLIC_PROTOCOL.md) | Data, timing, review, and privacy rules | Yes |
 | [`WEEKLY-REVIEW-PROTOCOL.md`](WEEKLY-REVIEW-PROTOCOL.md) | Weekly report generator protocol | Yes |
+| [`antifragile/source_contract.py`](antifragile/source_contract.py) | Freshness + artifact consistency gates | Yes |
+| [`antifragile/quantile_tiers.py`](antifragile/quantile_tiers.py) | Distribution-derived classification bands | Yes |
+| [`antifragile/claim_audit.py`](antifragile/claim_audit.py) | Post-render claim auditor | Yes |
+| [`antifragile/defer_gate.py`](antifragile/defer_gate.py) | Conservative defer state machine | Yes |
+| [`docs/CASE-STUDIES.md`](docs/CASE-STUDIES.md) | Capability map, STAR narratives, interview bank | Yes |
 
 The reference runner uses only the standard library. Optional research modules may use your chosen data libraries when you build them into a local workflow. Provider credentials and source-specific rules remain local.
 
@@ -200,6 +241,8 @@ The public core is source-adaptable. Calendars, session schedules, data limits, 
 - No external action execution, account integration, or automatic changes of any kind.
 - No claim of future performance, accuracy, or live results.
 - No generated report, local cache, personal record, email address, token, or API key belongs in a public commit.
+- A fresh source pull is not proof that the published artifact was rebuilt; both as-of values must match.
+- `test_public_privacy.py` scans public text before publication; a hit fails the suite.
 - A later announcement can trigger a new review, but it cannot be used to call an earlier report wrong unless it was already public before that report's evidence cutoff.
 - A validation window starts at the next actual data point, not at a convenient historical close.
 

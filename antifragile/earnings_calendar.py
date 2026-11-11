@@ -5,8 +5,8 @@
 
 目的
 ----
-将本地关注对象的「财报预约披露日期」提前体现在反脆弱周盘策略报告中。
-若某关注对象在报告日之后 N 天内（默认 7 天 = 下周窗口）披露财报，周报必须
+将本地关注对象的「财报预约披露日期」提前体现在周度研究报告中。
+若某关注对象在报告日之后 N 天内（默认 7 天 = 下周窗口）披露财报，报告必须
 明确列出，使读者在财报落地前就做好风险敞口与风控准备。
 
     > 例：7 月 22 日发布财报的关注对象，必须在 7 月 19 日的周报中写明。
@@ -14,7 +14,7 @@
 数据来源优先级（遵从 AGENTS.md：不得静默编造 / 不得静默降级为模拟数据）
 ------------------------------------------------------------------------
   1. 本地 earnings_calendar.json —— 用户维护或自动刷新缓存，作为 source of truth
-  2. 实时预约披露接口 best-effort（东方财富 / 巨潮资讯）—— 任一成功即采用，失败降级
+  2. 公开披露数据源 best-effort —— 任一成功即采用，失败显式降级
   3. 两者皆缺 → 明确标注 ⚠️ 财报日历数据缺失，绝不编造任何日期
 
 earnings_calendar.json 字段说明
@@ -193,7 +193,7 @@ def fetch_live_scheduled_date(code: str) -> Optional[str]:
         预约披露日期字符串，或 None
     """
     raw = code.replace(".SH", "").replace(".SZ", "").replace(".BJ", "")
-    # 候选接口（东方财富 datacenter 预约披露报表；历史 reportName 可能随版本变动）
+    # 候选公开披露数据接口（预约披露报表；历史参数名可能随版本变动）
     candidates = [
         f"https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_PUBLIC_BS_DATEPRE"
         f"&columns=SECURITY_CODE,SECURITY_NAME_ABBR,PRE_DATE,REPORT_DATE"
@@ -474,7 +474,7 @@ def generate_earnings_calendar_section(
     extended_days: Optional[int] = None,
 ) -> str:
     """
-    Weekly_strategy.generate() 的接入函数。
+    周度研究报告生成器的接入函数。
     返回「一、财报披露前瞻」完整编号章节（含 ## 编号与子章节）。
     """
     body = generate_section(

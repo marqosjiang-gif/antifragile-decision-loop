@@ -46,3 +46,9 @@
 - `antifragile/freshness.py`：同时检查事件时效和扫描维度完整性。
 - `antifragile/capital_flows.py`：精确 5/10/20 日累计，并按规模分档解释长期资金。
 - `antifragile/decision.py`：生存风险硬门槛、趋势通道样本门槛和带内位置一致性。
+- `antifragile/source_contract.py`：取数新鲜度＋渲染产物一致性双门，防止「拉新后忘重跑」静默放行。
+- `antifragile/quantile_tiers.py`：由观测序列推导五档分位带，并可计算旧阈值的经验分位以证伪刻度错位。
+- `antifragile/claim_audit.py`：渲染后的只读断言审计（0/1/2 退出码），检查主体点名、量化锚点、来源标注与归因并列。
+- `antifragile/defer_gate.py`：四状态保守后置门；机器推断的支撑事实一律拒绝，不可核验一律降级。
+
+以上四个模块均为纯标准库、领域无关、带回归锁（`test_public_iteration.py`）；脱敏扫描见 `test_public_privacy.py`。岗位能力映射与 STAR 讲述稿见 [`docs/POSITION-FIT.zh-CN.md`](docs/POSITION-FIT.zh-CN.md)。

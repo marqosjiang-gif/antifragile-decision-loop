@@ -27,6 +27,14 @@ reporting lag must never be silently copied into another context profile.
 - Validate a weekend report from the next actual data open to the final actual close of that data week. Use one adjusted series for movement and drawdown.
 - Compute a weekly move as `(last actual close / first actual open - 1) * 100`.
 
+## Data contract and post-render audit
+
+- A source pull and a rendered artifact are separate objects with separate `as_of` values. Publishing requires the pull to be fresh **and** the artifact to carry the identical `as_of`; a fresh pull with a stale artifact is a blocked render, not a warning.
+- A failed source cannot be silently replaced by a fallback that impersonates the primary source. Label the substitution and keep it visible.
+- A claim audit runs **after** rendering. Every directional claim must name its subject, carry a quantified anchor with an as-of, cite a reachable source, and present competing attributions in parallel instead of adjudicating between them. The auditor is read-only and reports fixable findings versus hard violations.
+- Human-registered facts are consumed, never inferred. Any unverified, stale, or machine-inferred support degrades to a conservative state.
+- A rule is considered landed only after its consumer path is verified end to end; a documented rule with no execution checkpoint is still a gap.
+
 ## Decision hierarchy
 
 1. Data integrity and survival-risk gates
